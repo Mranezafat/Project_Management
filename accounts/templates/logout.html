@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Logout</title>
+</head>
+
+<body>
+    <div id="logout-message" style="display:none;">
+        <h2 id="logout-title"></h2>
+        <a id="login-link" href="{% url 'login' %}" style="display:none;">Login again</a>
+    </div>
+
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        window.onload = function () {
+            const csrfToken = getCookie('csrftoken');
+            console.log('CSRF Token:', csrfToken);
+
+
+
+
+            fetch('/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                credentials: 'include'
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            return { error: "You are not logged in." };
+                        }
+                        throw new Error('Network response was not ok.');
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    document.getElementById('logout-message').style.display = 'block';
+                    if (data.message) {
+                        document.getElementById('logout-title').innerText = data.message;
+                        document.getElementById('login-link').style.display = 'inline';
+                    } else if (data.error) {
+                        document.getElementById('logout-title').innerText = data.error;
+                        document.getElementById('login-link').style.display = 'inline';
+                    } else {
+                        document.getElementById('logout-title').innerText = "Unknown response.";
+                    }
+                })
+                .catch(function (error) {
+                    document.getElementById('logout-message').style.display = 'block';
+                    document.getElementById('logout-title').innerText = "Logout failed: " + error.message;
+                });
+        };
+    </script>
+</body>
+
+</html>
