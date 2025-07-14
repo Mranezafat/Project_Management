@@ -8,12 +8,17 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 class UserRegisterPageView(TemplateView):
     template_name = 'register.html'
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return super().get(request, *args, **kwargs)
     
 class UserRegisterAPIView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
-
 class UserLoginAPIView(generics.GenericAPIView):
     serializer_class = UserLoginSerializer
     def post(self, request, *args, **kwargs):

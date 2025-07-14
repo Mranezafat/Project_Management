@@ -54,9 +54,22 @@
             const data = await response.json();
             if (response.ok) {
                 document.getElementById('message').innerText = "Registration successful!";
+                window.location.href = '/login/';
                 form.reset();
-            } else {
-                document.getElementById('message').innerText = JSON.stringify(data);
+            } if (response.status === 400 && data.email) {
+                document.getElementById('message').innerText = "Error: " + data.email;
+            } if(response.status === 400 && data.username) {
+                document.getElementById('message').innerText = "Error: " + data.username;
+            } if (response.status === 400 && data.password) {
+                document.getElementById('message').innerText = "Error: " + data.password;
+            }
+            if(input.password.length < 8) {
+                document.getElementById('message').innerText = "Password must be at least 8 characters long.";
+            } else if (response.status === 500) {
+                document.getElementById('message').innerText = "Server error. Please try again later.";
+            }
+            else {
+                document.getElementById('message').innerText = "An unexpected error occurred.";
             }
         });
     </script>
