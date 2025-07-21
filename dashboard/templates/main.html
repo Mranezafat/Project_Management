@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-white text-gray-800">
+
+    <!-- Header and Menu -->
+    <div class="flex justify-between items-center p-4 border-b relative">
+        <!-- User Button with Dropdown -->
+        <div class="relative">
+            <button id="userButton" class="font-bold text-xl text-blue-600 focus:outline-none">
+                User: {{ username|escapejs }}
+            </button>
+            <div id="userMenu" class="hidden absolute mt-2 right-0 bg-white border rounded shadow-lg w-40">
+                <button id="logoutBtn"
+                    class="block w-full text-right px-4 py-2 hover:bg-gray-100 text-red-600">Logout</button>
+                <button id="cancelBtn" class="block w-full text-right px-4 py-2 hover:bg-gray-100">Cancel</button>
+            </div>
+        </div>
+
+        <nav class="flex gap-4">
+            <a href="#home" class="text-blue-600 hover:text-blue-800">Home</a>
+            <a href="#Posts" class="text-blue-600 hover:text-blue-800">Posts</a>
+            <a href="#Tasks" class="text-blue-600 hover:text-blue-800">Tasks</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main id="content" class="p-4"></main>
+
+    <script>
+        console.log("Script loaded");
+
+        async function loadPage(page) {
+            try {
+                const path = `/static/templates/${page}.html`;
+                const response = await fetch(path);
+                if (!response.ok) throw new Error('Page not found');
+                const html = await response.text();
+                document.getElementById('content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('content').innerHTML = "<p class='text-red-500'>404 not found</p>";
+                console.error(`Error loading page: ${error}`);
+            }
+        }
+
+        function router() {
+            const hash = window.location.hash.substring(1) || 'home';
+            console.log(`Routing to: ${hash}`);
+            loadPage(hash);
+        }
+
+        window.addEventListener('hashchange', router);
+        window.addEventListener('load', router);
+
+        // Dropdown functionality
+        const userButton = document.getElementById('userButton');
+        const userMenu = document.getElementById('userMenu');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+
+        userButton.addEventListener('click', () => {
+            userMenu.classList.toggle('hidden');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            userMenu.classList.add('hidden');
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            window.location.href = "/logout/";
+        });
+
+        // Hide menu on outside click
+        document.addEventListener('click', (event) => {
+            if (!userButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+    </script>
+
+</body>
+
+</html>

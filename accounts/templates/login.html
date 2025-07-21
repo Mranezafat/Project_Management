@@ -63,6 +63,7 @@
           const data = await response.json();
           messageDiv.style.color = 'green';
           messageDiv.innerText = "Welcome!";
+          window.location.href = '/dashboard/';
           // You can do more stuff here after successful login
           form.reset();
         } else {
